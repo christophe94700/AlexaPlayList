@@ -1208,7 +1208,7 @@ if (isset($_POST['list'])) {
 						<button type="submit"  name="add" class="btn btn-primary"><i class="fa fa-check-circle"></i> <?php echo lng('Add') ?></button> &nbsp;
                         <b><a href="?p=<?php echo urlencode(FM_PATH) ?>" class="btn btn-outline-primary"><i class="fa fa-times-circle"></i> <?php echo lng('Cancel') ?></a></b>
                     
-					<i class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i><?php echo lng('Shuffle: ') ?><input type="checkbox" name="shuffle" value="0">
+					<i class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i><?php echo lng('Shuffle: ') ?><input type="checkbox" name="shuffle" value="1">
 					</p>
                 </form>                 
             </div>
