@@ -1,6 +1,6 @@
 <?php
 //Default Configuration
-$CONFIG = '{"lang":"fr","error_reporting":true,"show_hidden":true,"hide_Cols":true,"calc_folder":true}';
+$CONFIG = '{"lang":"fr","error_reporting":true,"show_hidden":true,"hide_Cols":true,"calc_folder":true,"theme":"light"}';
 /*
 #################################################################################################################
 This is an OPTIONAL configuration file.
@@ -31,10 +31,6 @@ $auth_users = array(
 $readonly_users = array(
     'user'
 );
-
-//set application theme
-//options - 'light' and 'dark'
-$theme = 'light';
 
 // Enable highlight.js (https://highlightjs.org/) on view's page
 $use_highlightjs = true;
@@ -105,7 +101,6 @@ $online_viewer = 'google';
 // true => enable sticky header
 // false => disable sticky header
 $sticky_navbar = true;
-
 
 // max upload file size
 $max_upload_size_bytes = 5000;
