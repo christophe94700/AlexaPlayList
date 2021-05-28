@@ -380,7 +380,10 @@
 		"OFF":"NON",
 		"Directory selection : ":"Séléction répertoire: ",
 		"No selection":"Pas de sélection",
-		"Managing IP addresses with access authorization":"Gestion des adresses IP avec autorisation d'accès"
+		"Managing IP addresses with access authorization":"Gestion des adresses IP avec autorisation d'accès",
+		"light":"clair",
+		"dark":"sombre",
+		"Theme":"Thème"
 
       }
     },
