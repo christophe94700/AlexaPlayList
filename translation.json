@@ -1,6 +1,6 @@
 {
   "appName": "Alexa List MP3",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "language": [
     {
       "name": "Norsk",
@@ -383,7 +383,8 @@
 		"Managing IP addresses with access authorization":"Gestion des adresses IP avec autorisation d'accès",
 		"light":"clair",
 		"dark":"sombre",
-		"Theme":"Thème"
+		"Theme":"Thème",
+        "Player":"Lecteur"
 
       }
     },

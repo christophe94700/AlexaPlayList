@@ -10,10 +10,10 @@
 *Christophe Caron
 *https://domotronic.fr
 *christophe@caron.tv
-* Version 0.1.1
+* Version 0.1.2
 */
 //TFM version
-define('VERSION', '0.1.1');
+define('VERSION', '0.1.2');
 
 //Application Title
 define('APP_TITLE', 'Alexa List MP3');
@@ -1169,6 +1169,53 @@ if (isset($_GET['upload']) && !FM_READONLY) {
     fm_show_footer();
     exit;
 }
+
+
+
+// play form
+if (isset($_GET['player']) && !FM_READONLY) {
+    fm_show_header(); // HEADER
+    fm_show_nav_path(FM_PATH); // current path
+    //get the allowed file extensions
+
+    ?>
+     <!-- (A) AUDIO TAG -->
+    <audio id="PlayerAudio" controls></audio>
+
+    <!-- (B) PLAYLIST -->
+    <div id="ListPlayer">
+    <?php
+      // (B1) GET ALL SONGS
+    $str = FM_ROOT_PATH.'/playlist.m3u';
+    $lines = file($str);
+    $num_id=0;
+    foreach ($lines as $line_num => $line) {
+   
+        if ($line_num&1){
+            ++$num_id;           
+            $line=str_replace('#EXTINF:-1,','',$line);
+            $line= urldecode($line);
+            $listmp3[]="N° ".$num_id." - ".htmlspecialchars($line);
+        }
+        else {
+            if ($line_num > 1) {$songs[] =$line;}
+        }
+    }
+      // (B2) OUTPUT SONGS IN <DIV>
+    if (is_array($songs)) { foreach ($songs as $k=>$s) {
+        printf("<div data-id='%u' data-src='%s' class='song'>%s</div>",
+          $k, $s, $listmp3[$k]
+        );
+      }} else { echo "No songs found!"; }
+    ?></div>
+    <script src="js/audio.js"></script>
+    <?php
+    fm_show_footer();
+    exit;
+}
+
+
+
 
 //Christophe Alexa List mp3
 // list mp3 form POST
@@ -3456,6 +3503,9 @@ function fm_show_nav_path($path)
                         <a title="<?php echo lng('Upload') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> <?php echo lng('Upload') ?></a>
                     </li>
                     <li class="nav-item">
+                        <a title="<?php echo lng('Player') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;player"><i class="fa fa-play-circle" aria-hidden="true"></i> <?php echo lng('Player') ?></a>
+                    </li>
+                    <li class="nav-item">
                         <a title="<?php echo lng('NewItem') ?>" class="nav-link" href="#createNewItem" data-toggle="modal" data-target="#createNewItem"><i class="fa fa-plus-square"></i> <?php echo lng('NewItem') ?></a>
                     </li>
                     <?php endif; ?>
@@ -4134,6 +4184,7 @@ function lng($txt) {
     $tr['en']['Login failed. Invalid username or password'] = 'Login failed. Invalid username or password';
     $tr['en']['password_hash not supported, Upgrade PHP version'] = 'password_hash not supported, Upgrade PHP version';
 	$tr['en'] ['Shuffle: '] = 'Shuffle: '; 
+    $tr['en'] ['Player'] = 'Player'; 
 
     $i18n = fm_get_translations($tr);
     $tr = $i18n ? $i18n : $tr;
