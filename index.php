@@ -1173,7 +1173,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
 
 
 // play form
-if (isset($_GET['player']) && !FM_READONLY) {
+if (isset($_GET['player'])) {
     fm_show_header(); // HEADER
     fm_show_nav_path(FM_PATH); // current path
     //get the allowed file extensions
@@ -3502,9 +3502,11 @@ function fm_show_nav_path($path)
                     <li class="nav-item">
                         <a title="<?php echo lng('Upload') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> <?php echo lng('Upload') ?></a>
                     </li>
+                                        <?php endif; ?>
                     <li class="nav-item">
                         <a title="<?php echo lng('Player') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;player"><i class="fa fa-play-circle" aria-hidden="true"></i> <?php echo lng('Player') ?></a>
                     </li>
+                    <?php if (!FM_READONLY): ?>
                     <li class="nav-item">
                         <a title="<?php echo lng('NewItem') ?>" class="nav-link" href="#createNewItem" data-toggle="modal" data-target="#createNewItem"><i class="fa fa-plus-square"></i> <?php echo lng('NewItem') ?></a>
                     </li>
