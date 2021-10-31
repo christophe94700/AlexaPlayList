@@ -10,10 +10,10 @@
 *Christophe Caron
 *https://domotronic.fr
 *christophe@caron.tv
-* Version 0.1.2
+* Version 0.1.3
 */
 //TFM version
-define('VERSION', '0.1.2');
+define('VERSION', '0.1.3');
 
 //Application Title
 define('APP_TITLE', 'Alexa List MP3');
@@ -178,6 +178,20 @@ if ($use_auth) {
             if (isset($auth_users[$_POST['fm_usr']]) && isset($_POST['fm_pwd']) && password_verify($_POST['fm_pwd'], $auth_users[$_POST['fm_usr']])) {
                 $_SESSION[FM_SESSION_ID]['logged'] = $_POST['fm_usr'];
                 fm_set_msg(lng('You are logged in'));
+                // Automatique Add ip to acces files MP3
+                $lines = file($root_path.'/.htaccess'); //Open file htaccess
+                $newip=0;
+                foreach ($lines as $line_num => $line) {
+                    $pos =FALSE;
+                    $pos = stripos($line, $_SERVER['REMOTE_ADDR']);
+                    if ($pos !== FALSE) $newip+=1;           
+                    }
+                if ($newip==0){
+                    $adrip="Allow from ". $_SERVER['REMOTE_ADDR']."\n";
+                    $str = $root_path.'/.htaccess';
+                    file_put_contents($str,$adrip,FILE_APPEND) or die("Can't create htaccess file. Please check permissions.");
+                    } 
+                // Automatique Add ip to acces files MP3
                 fm_redirect(FM_SELF_URL . '?p=');
             } else {
                 unset($_SESSION[FM_SESSION_ID]['logged']);
