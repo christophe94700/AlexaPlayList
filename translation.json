@@ -1,6 +1,6 @@
 {
   "appName": "Alexa List MP3",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "language": [
     {
       "name": "Norsk",
@@ -384,7 +384,13 @@
 		"light":"clair",
 		"dark":"sombre",
 		"Theme":"Thème",
-        "Player":"Lecteur"
+        "Player":"Lecteur",
+        "Created":"créé",
+        "to":"vers",
+        "Deleted":"Effacé",
+        "Error while renaming from":"Erreur lors du changement de nom depuis",
+        "Invalid characters in file name":"Caractères invalides dans le nom du fichier",
+        "Renamed from":"Renommé de"
 
       }
     },
