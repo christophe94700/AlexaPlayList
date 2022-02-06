@@ -3993,13 +3993,12 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
         if (typeof n !== 'undefined' && n !== null) {
             if (true) {
                 var data = {ajax: true, content: n, type: 'save'};
-
                 $.ajax({
                     type: "POST",
                     url: window.location,
                     // The key needs to match your method's input parameter (case-sensitive).
                     data: JSON.stringify(data),
-                    contentType: "multipart/form-data-encoded; charset=utf-8",
+                    contentType: "application/json; charset=utf-8",
                     //dataType: "json",
                     success: function(mes){toast("Saved Successfully"); window.onbeforeunload = function() {return}},
                     failure: function(mes) {toast("Error: try again");},
