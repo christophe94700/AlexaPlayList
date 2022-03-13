@@ -1,19 +1,19 @@
 <?php
 /**
- * H3K | Tiny File Manager V2.4.6
+ * H3K | Tiny File Manager V2.4.7
  * CCP Programmers | ccpprogrammers@gmail.com
  * https://tinyfilemanager.github.io
  */
  
 /**
-*Alexa GÃ©nÃ©rateur de liste MP3
+*Alexa Générateur de liste MP3
 *Christophe Caron
 *https://domotronic.fr
 *christophe@caron.tv
-* Version 0.1.4
+* Version 0.1.5
 */
 //TFM version
-define('VERSION', '0.1.4');
+define('VERSION', '0.1.5');
 
 //Application Title
 define('APP_TITLE', 'Alexa List MP3');
@@ -127,8 +127,20 @@ if (isset($_GET['logout'])) {
 }
 
 // Validate connection IP
-if($ip_ruleset != 'OFF'){
-    $clientIp = $_SERVER['REMOTE_ADDR'];
+
+if ($ip_ruleset != 'OFF') {
+    function getClientIP() {       
+        if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)) {
+            return  $_SERVER["HTTP_X_FORWARDED_FOR"];
+        }else if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
+            return $_SERVER['REMOTE_ADDR'];
+        }else if (array_key_exists('HTTP_CLIENT_IP', $_SERVER)) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        }
+        return '';
+    }
+
+    $clientIp = getClientIP();
 
     $proceed = false;
 
@@ -806,6 +818,9 @@ if (isset($_GET['dl'])) {
 // Upload
 if (!empty($_FILES) && !FM_READONLY) {
     $override_file_name = false;
+    $chunkIndex = $_POST['dzchunkindex'];
+    $chunkTotal = $_POST['dztotalchunkcount'];
+
     $f = $_FILES;
     $path = FM_ROOT_PATH;
     $ds = DIRECTORY_SEPARATOR;
@@ -823,7 +838,7 @@ if (!empty($_FILES) && !FM_READONLY) {
 
     $filename = $f['file']['name'];
     $tmp_name = $f['file']['tmp_name'];
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $ext = pathinfo($filename, PATHINFO_FILENAME) != '' ? strtolower(pathinfo($filename, PATHINFO_EXTENSION)) : '';
     $isFileAllowed = ($allowed) ? in_array($ext, $allowed) : true;
 
     if(!fm_isvalid_filename($filename) && !fm_isvalid_filename($_REQUEST['fullpath'])) {
@@ -836,12 +851,12 @@ if (!empty($_FILES) && !FM_READONLY) {
 
     $targetPath = $path . $ds;
     if ( is_writable($targetPath) ) {
-        $fullPath = $path . '/' . str_replace("./","_",$_REQUEST['fullpath']);
+        $fullPath = $path . '/' . basename($_REQUEST['fullpath']);
         $folder = substr($fullPath, 0, strrpos($fullPath, "/"));
 
-        if(file_exists ($fullPath) && !$override_file_name) {
+        if(file_exists ($fullPath) && !$override_file_name && !$chunks) {
             $ext_1 = $ext ? '.'.$ext : '';
-            $fullPath = str_replace($ext_1, '', $fullPath) .'_'. date('ymdHis'). $ext_1;
+            $fullPath = $path . '/' . basename($_REQUEST['fullpath'], $ext_1) .'_'. date('ymdHis'). $ext_1;
         }
 
         if (!is_dir($folder)) {
@@ -850,8 +865,44 @@ if (!empty($_FILES) && !FM_READONLY) {
             umask($old);
         }
 
+
+
         if (empty($f['file']['error']) && !empty($tmp_name) && $tmp_name != 'none' && $isFileAllowed) {
-            if (move_uploaded_file($tmp_name, $fullPath)) {
+            if ($chunkTotal){
+                $out = @fopen("{$fullPath}.part", $chunkIndex == 0 ? "wb" : "ab");
+                if ($out) {
+                    $in = @fopen($tmp_name, "rb");
+                    if ($in) {
+                        while ($buff = fread($in, 4096)) { fwrite($out, $buff); }
+                    } else {
+                        $response = array (
+                        'status'    => 'error',
+                        'info' => "failed to open output stream"
+                        );
+                    }
+                    @fclose($in);
+                    @fclose($out);
+                    @unlink($tmp_name);
+
+                    $response = array (
+                        'status'    => 'success',
+                        'info' => "file upload successful",
+                        'fullPath' => $fullPath
+                    );
+                } else {
+                    $response = array (
+                        'status'    => 'error',
+                        'info' => "failed to open output stream"
+                        );
+                }
+
+
+
+                if ($chunkIndex == $chunkTotal - 1) {
+                    rename("{$fullPath}.part", $fullPath);
+                }
+
+            } else if (move_uploaded_file($tmp_name, $fullPath)) {
                 // Be sure that the file has been uploaded
                 if ( file_exists($fullPath) ) {
                     $response = array (
@@ -1147,6 +1198,9 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                     <li class="nav-item">
                         <a class="nav-link active" href="#fileUploader" data-target="#fileUploader"><i class="fa fa-arrow-circle-o-up"></i> <?php echo lng('UploadingFiles') ?></a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#urlUploader" class="js-url-upload" data-target="#urlUploader"><i class="fa fa-link"></i> Upload from URL</a>
+                    </li>
                 </ul>
             </div>
             <div class="card-body">
@@ -1178,8 +1232,14 @@ if (isset($_GET['upload']) && !FM_READONLY) {
     <script src="js/dropzone.min.js"></script>
     <script>
         Dropzone.options.fileUploader = {
+            chunking: true,
+            chunkSize: 10000000,
+            forceChunking: true,
+            retryChunks: true,
+            retryChunksLimit: 3,
+            parallelUploads: 1, // does not support more than 1!
             timeout: 120000,
-            maxFilesize: <?php echo MAX_UPLOAD_SIZE; ?>,
+            maxFilesize: 10000000000,
             acceptedFiles : "<?php echo getUploadExt() ?>",
             init: function () {
                 this.on("sending", function (file, xhr, formData) {
@@ -1190,9 +1250,11 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                     });
                 }).on("success", function (res) {
                     let _response = JSON.parse(res.xhr.response);
+
                     if(_response.status == "error") {
                         toast(_response.info);
                     }
+
                 }).on("error", function(file, response) {
                     toast(response);
                 });
@@ -1553,7 +1615,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
                             </div>
                         </div>
                     </div>
-					
+
                     <div class="form-group row">
                         <label for="js-3-1" class="col-sm-3 col-form-label"><?php echo lng('Theme') ?></label>
                         <div class="col-sm-5">
@@ -1653,7 +1715,6 @@ if (isset($_GET['help'])) {
                         <p><?php echo lng('Author') ?>: Christophe Caron</p>
                         <p><?php echo lng('Mail Us') ?>: <a href="mailto:christophe@caron.tv">christophe@caron.tv</a> </p>
                     </div>
-                    
                 </div>
                 <div class="row js-new-pwd hidden mt-2">
                     <div class="col-12">
@@ -1889,6 +1950,7 @@ if (isset($_GET['edit'])) {
         fm_set_msg(lng('File not found'), 'error');
         fm_redirect(FM_SELF_URL . '?p=' . urlencode(FM_PATH));
     }
+    $editFile = ' : <i><b>'. $file. '</b></i>';
     header('X-XSS-Protection:0');
     fm_show_header(); // HEADER
     fm_show_nav_path(FM_PATH); // current path
@@ -1947,7 +2009,6 @@ if (isset($_GET['edit'])) {
             <div class="edit-file-actions col-xs-12 col-sm-7 col-lg-6 text-right pt-1">
                 <a title="<?php echo lng('Back') ?>" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;view=<?php echo urlencode($file) ?>"><i class="fa fa-reply-all"></i> <?php echo lng('Back') ?></a>
                 <a title="<?php echo lng('BackUp') ?>" class="btn btn-sm btn-outline-primary" href="javascript:void(0);" onclick="backup('<?php echo urlencode(trim(FM_PATH)) ?>','<?php echo urlencode($file) ?>')"><i class="fa fa-database"></i> <?php echo lng('BackUp') ?></a>
-
                 <?php if ($is_text) { ?>
                     <?php if ($isNormalEditor) { ?>
                         <a title="Advanced" class="btn btn-sm btn-outline-primary" href="?p=<?php echo urlencode(trim(FM_PATH)) ?>&amp;edit=<?php echo urlencode($file) ?>&amp;env=ace"><i class="fa fa-pencil-square-o"></i> <?php echo lng('AdvancedEditor') ?></a>
@@ -2149,7 +2210,6 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                             <a title="<?php echo lng('Rename')?>" href="#" onclick="rename('<?php echo fm_enc(addslashes(FM_PATH)) ?>', '<?php echo fm_enc(addslashes($f)) ?>');return false;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                             <a title="<?php echo lng('CopyTo')?>..." href="?p=&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o" aria-hidden="true"></i></a>
                         <?php endif; ?>
-                        <a title="<?php echo lng('DirectLink')?>" href="<?php echo fm_enc(FM_ROOT_URL . (FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $f . '/') ?>" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>
                     </td>
                 </tr>
                 <?php
@@ -2207,15 +2267,13 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                         <td><?php echo fm_enc($owner['name'] . ':' . $group['name']) ?></td>
                     <?php endif; ?>
                     <td class="inline-actions">
-                        <a title="<?php echo lng('Preview') ?>" href="<?php echo $filelink.'&quickView=1'; ?>" data-toggle="lightbox" data-gallery="tiny-gallery" data-title="<?php echo fm_convert_win(fm_enc($f)) ?>" data-max-width="100%" data-width="100%"><i class="fa fa-eye"></i></a>
                         <?php if (!FM_READONLY): ?>
                             <a title="<?php echo lng('Delete') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="return confirm('<?php echo lng('Delete').' '.lng('File').'?'; ?>\n \n ( <?php echo urlencode($f) ?> )');"> <i class="fa fa-trash-o"></i></a>
                             <a title="<?php echo lng('Rename') ?>" href="#" onclick="rename('<?php echo fm_enc(addslashes(FM_PATH)) ?>', '<?php echo fm_enc(addslashes($f)) ?>');return false;"><i class="fa fa-pencil-square-o"></i></a>
                             <a title="<?php echo lng('CopyTo') ?>..."
                                href="?p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o"></i></a>
                         <?php endif; ?>
-                        <a title="<?php echo lng('DirectLink') ?>" href="<?php echo fm_enc(FM_ROOT_URL . (FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $f) ?>" target="_blank"><i class="fa fa-link"></i></a>
-                        <a title="<?php echo lng('Download') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>"><i class="fa fa-download"></i></a>
+                            <a title="<?php echo lng('Download') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>"><i class="fa fa-download"></i></a>
                     </td>
                 </tr>
                 <?php
@@ -2680,24 +2738,20 @@ function fm_get_filesize($size)
 }
 
 /**
- * Get director total size
- * @param string $directory
- * @return int
+ * Get total size of directory tree.
+ *
+ * @param  string $directory Relative or absolute directory name.
+ * @return int Total number of bytes.
  */
 function fm_get_directorysize($directory) {
-    global $calc_folder;
-    if ($calc_folder==true) { //  Slower output
-      $size = 0;  $count= 0;  $dirCount= 0;
-    foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory)) as $file)
-    if ($file->isFile())
-        {   $size+=$file->getSize();
-            $count++;
+    $bytes = 0;
+    $directory = realpath($directory);
+    if ($directory !== false && $directory != '' && file_exists($directory)){
+        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS)) as $file){
+            $bytes += $file->getSize();
         }
-    else if ($file->isDir()) { $dirCount++; }
-    // return [$size, $count, $dirCount];
-    return $size;
     }
-    else return 'Folder'; //  Quick output
+    return $bytes;
 }
 
 /**
@@ -3496,7 +3550,7 @@ class FM_Zipper_Tar
  */
 function fm_show_nav_path($path)
 {
-    global $lang, $sticky_navbar;
+    global $lang, $sticky_navbar, $editFile;
     $isStickyNavBar = $sticky_navbar ? 'fixed-top' : '';
     $getTheme = fm_get_theme();
     $getTheme .= " navbar-light";
@@ -3529,7 +3583,7 @@ function fm_show_nav_path($path)
                 }
                 $root_url .= $sep . implode($sep, $array);
             }
-            echo '<div class="col-xs-6 col-sm-5">' . $root_url . '</div>';
+            echo '<div class="col-xs-6 col-sm-5">' . $root_url . $editFile . '</div>';
             ?>
 
             <div class="col-xs-6 col-sm-7 text-right">
@@ -3850,6 +3904,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
 <div id="wrapper" class="container-fluid">
 <!-- Affichage -->
 
+    <!-- New Item creation -->
     <div class="modal fade" id="createNewItem" tabindex="-1" role="dialog" aria-label="newItemModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content <?php echo fm_get_theme(); ?>">
@@ -3993,6 +4048,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
         if (typeof n !== 'undefined' && n !== null) {
             if (true) {
                 var data = {ajax: true, content: n, type: 'save'};
+
                 $.ajax({
                     type: "POST",
                     url: window.location,
@@ -4004,7 +4060,6 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
                     failure: function(mes) {toast("Error: try again");},
                     error: function(mes) {toast(`<p style="background-color:red">${mes.responseText}</p>`);}
                 });
-
             } else {
                 var a = document.createElement("form");
                 a.setAttribute("method", "POST"), a.setAttribute("action", "");
@@ -4238,20 +4293,20 @@ function lng($txt) {
  
  // new - novos
     
-    $tr['en']['Advanced Search']    = 'Advanced Search';    $tr['en']['Error while copying fro']    = 'Error while copying fro';
+    $tr['en']['Advanced Search']    = 'Advanced Search';    $tr['en']['Error while copying from']    = 'Error while copying from';
     $tr['en']['Nothing selected']   = 'Nothing selected';   $tr['en']['Paths must be not equal']    = 'Paths must be not equal';
     $tr['en']['Renamed from']       = 'Renamed from';       $tr['en']['Archive not unpacked']       = 'Archive not unpacked';
-    $tr['en']['Deleted']            = 'Deleted';            $tr['en']['Archive not created']        = 'Archive not created';        
+    $tr['en']['Deleted']            = 'Deleted';            $tr['en']['Archive not created']        = 'Archive not created';
     $tr['en']['Copied from']        = 'Copied from';        $tr['en']['Permissions changed']        = 'Permissions changed';
     $tr['en']['to']                 = 'to';                 $tr['en']['Saved Successfully']         = 'Saved Successfully';
     $tr['en']['not found!']         = 'not found!';         $tr['en']['File Saved Successfully']    = 'File Saved Successfully';
-    $tr['en']['Archive']            = 'Archive';            $tr['en']['Permissions not changed']    = 'Permissions not changed';         
+    $tr['en']['Archive']            = 'Archive';            $tr['en']['Permissions not changed']    = 'Permissions not changed';
     $tr['en']['Select folder']      = 'Select folder';      $tr['en']['Source path not defined']    = 'Source path not defined';
     $tr['en']['already exists']     = 'already exists';     $tr['en']['Error while moving from']    = 'Error while moving from';
     $tr['en']['Create archive?']    = 'Create archive?';    $tr['en']['Invalid file or folder name']    = 'Invalid file or folder name';
     $tr['en']['Archive unpacked']   = 'Archive unpacked';   $tr['en']['File extension is not allowed']  = 'File extension is not allowed';
     $tr['en']['Root path']          = 'Root path';          $tr['en']['Error while renaming from']  = 'Error while renaming from';
-    $tr['en']['File not found']     = 'File not found';     $tr['en']['Error while deleting items'] = 'Error while deleting items';   
+    $tr['en']['File not found']     = 'File not found';     $tr['en']['Error while deleting items'] = 'Error while deleting items';
     $tr['en']['Invalid characters in file name']                = 'Invalid characters in file name';
     $tr['en']['FILE EXTENSION HAS NOT SUPPORTED']               = 'FILE EXTENSION HAS NOT SUPPORTED';
     $tr['en']['Selected files and folder deleted']              = 'Selected files and folder deleted';
@@ -4262,8 +4317,8 @@ function lng($txt) {
     $tr['en']['Invalid characters in file or folder name']      = 'Invalid characters in file or folder name';
     $tr['en']['Operations with archives are not available']     = 'Operations with archives are not available';
     $tr['en']['File or folder with this path already exists']   = 'File or folder with this path already exists';
-    
-    $tr['en']['Moved from']                 = 'Moved from'; 
+
+    $tr['en']['Moved from']                 = 'Moved from';
 
     $i18n = fm_get_translations($tr);
     $tr = $i18n ? $i18n : $tr;
