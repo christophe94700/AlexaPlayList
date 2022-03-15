@@ -851,7 +851,7 @@ if (!empty($_FILES) && !FM_READONLY) {
 
     $targetPath = $path . $ds;
     if ( is_writable($targetPath) ) {
-        $fullPath = $path . '/' . basename($_REQUEST['fullpath']);
+        $fullPath = $path . '/' . str_replace("./","_",$_REQUEST['fullpath']);
         $folder = substr($fullPath, 0, strrpos($fullPath, "/"));
 
         if(file_exists ($fullPath) && !$override_file_name && !$chunks) {
@@ -1198,9 +1198,6 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                     <li class="nav-item">
                         <a class="nav-link active" href="#fileUploader" data-target="#fileUploader"><i class="fa fa-arrow-circle-o-up"></i> <?php echo lng('UploadingFiles') ?></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#urlUploader" class="js-url-upload" data-target="#urlUploader"><i class="fa fa-link"></i> Upload from URL</a>
-                    </li>
                 </ul>
             </div>
             <div class="card-body">
@@ -1291,7 +1288,7 @@ if (isset($_GET['player'])) {
             ++$num_id;           
             $line=str_replace('#EXTINF:-1,','',$line);
             $line= urldecode($line);
-            $listmp3[]="NÂ° ".$num_id." - ".htmlspecialchars($line);
+            $listmp3[]="N&deg; ".$num_id." - ".htmlspecialchars($line);
         }
         else {
             if ($line_num > 1) {$songs[] =$line;}
@@ -1372,7 +1369,7 @@ if (isset($_POST['list'])) {
 }
 
 //Christophe Alexa List mp3
-// list mp3 form CrÃ©ation
+// list mp3 form Création
 
 if (isset($_POST['listemp3'])&& isset($_POST['create'])) {
 	$copy_files=array();
@@ -1676,9 +1673,9 @@ if((isset($_POST['delhtaccess']))&& ($_POST["delhtaccess"]>0)) {
 	$ptr = fopen($str, "r");
 	$contenu = fread($ptr, filesize($str));
 	fclose($ptr);
-	$contenu = explode(PHP_EOL, $contenu); /* PHP_EOL contient le saut Ã  la ligne utilisÃ© sur le serveur (\n linux, \r\n windows ou \r Macintosh */
+	$contenu = explode(PHP_EOL, $contenu); /* PHP_EOL contient le saut à la ligne utilisé sur le serveur (\n linux, \r\n windows ou \r Macintosh */
 	unset($contenu[$deladrip+$hide_Ligne]); /* On supprime la ligne */
-	$contenu = array_values($contenu); /* RÃ©-indexe l'array */
+	$contenu = array_values($contenu); /* Ré-indexe l'array */
 	$contenu = implode(PHP_EOL, $contenu);
 	file_put_contents($str,$contenu) or die("Can't create htaccess file. Please check permissions.");
 	echo '<meta http-equiv="refresh" content="0" />';   // rafraichissement de la page
@@ -2738,10 +2735,9 @@ function fm_get_filesize($size)
 }
 
 /**
- * Get total size of directory tree.
- *
- * @param  string $directory Relative or absolute directory name.
- * @return int Total number of bytes.
+ * Get director total size
+ * @param string $directory
+ * @return int
  */
 function fm_get_directorysize($directory) {
     $bytes = 0;
@@ -3708,11 +3704,11 @@ global $lang, $root_url, $favicon_path;
 <?php 
 //echo FM_SELF_URL;
 
-// protocole utilisÃ© : http ou https ?
+// protocole utilisé : http ou https ?
 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') $url = "https://"; else $url = "http://";
-// hÃ´te (nom de domaine voire adresse IP)
+// hôte (nom de domaine voire adresse IP)
 $url .= $_SERVER['HTTP_HOST'];
-// emplacement de la ressource (nom de la page affichÃ©e). Utiliser $_SERVER['PHP_SELF'] si vous ne voulez pas afficher les paramÃ¨tres de la requÃªte
+// emplacement de la ressource (nom de la page affichée). Utiliser $_SERVER['PHP_SELF'] si vous ne voulez pas afficher les paramètres de la requête
 $url .= $_SERVER['REQUEST_URI'];
 // on affiche l'URL de la page courante
 //echo $url;
