@@ -1629,38 +1629,7 @@ if (isset($_GET['settings']) && !FM_READONLY) {
                     </div>
 
                 </form>
-				</div>
-				
-				<h6 class="card-header"><?php echo lng('Managing IP addresses with access authorization') ?></h6>
-				<div class="col-sm-9">
-				<form method="post">
-					<div class="form-group row">
-						 <label for="js-dir-1" class="col-sm-3 col-form-label"><?php echo lng('Add IP address');?></label>
-							<div class="col-sm-9">
-							<input type="text" name="htaccess" value="<?php echo $_SERVER['REMOTE_ADDR'];?>" />
-							<input type="submit" class="btn btn-secondary" value="<?php echo lng('Add');?>"/>		
-							</div>
-						</div>
-				</form>
-				<form method="post">
-					<div class="form-group row">
-							</br></br>
-							<label for="js-dir-1" class="col-sm-3 col-form-label"><?php echo lng('Delete IP address. Line number?');?></label>
-							<div class="col-sm-9">
-							<input type="number" name="delhtaccess" value="" />
-							<input type="submit" class="btn btn-secondary" value="<?php echo lng('Delete');?>"/>		
-							</div>
-						</div>
-				</form>	
-				<?php $lines = file(FM_ROOT_PATH.'/'.'.htaccess');
-					// display file line by line
-					foreach($lines as $line_num => $line) {
-						$line=str_replace("Allow from","IP: ",$line );
-						$my_line=$line_num-$hide_Ligne;
-						if ($line_num>$hide_Ligne) echo "  ".  lng('Line number') ." {$my_line} : ".htmlspecialchars($line)."<br />\n";
-					}?>
-			</div>
-			
+            </div>
         </div>
     </div>
 <?php
@@ -2253,7 +2222,7 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                                 <?php echo($is_link ? ' &rarr; <i>' . readlink($path . '/' . $f) . '</i>' : '') ?>
                         </div>
                     </td>
-                    <td data-sort=b-"<?php echo str_pad($filesize_raw, 18, "0", STR_PAD_LEFT); ?>"><span title="<?php printf('%s bytes', $filesize_raw) ?>">
+                    <td data-sort="b-<?php echo str_pad($filesize_raw, 18, "0", STR_PAD_LEFT); ?>"><span title="<?php printf('%s bytes', $filesize_raw) ?>">
                         <?php echo $filesize; ?>
                         </span></td>
                     <td data-sort="b-<?php echo $modif_raw;?>"><?php echo $modif ?></td>
@@ -2269,7 +2238,8 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                             <a title="<?php echo lng('CopyTo') ?>..."
                                href="?p=<?php echo urlencode(FM_PATH) ?>&amp;copy=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="fa fa-files-o"></i></a>
                         <?php endif; ?>
-                            <a title="<?php echo lng('Download') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>"><i class="fa fa-download"></i></a>
+                        <!-- Pas de DirectLink <a title="<?php echo lng('DirectLink') ?>" href="<?php echo fm_enc(FM_ROOT_URL . (FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $f) ?>" target="_blank"><i class="fa fa-link"></i></a> -->
+                        <a title="<?php echo lng('Download') ?>" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($f) ?>"><i class="fa fa-download"></i></a>
                     </td>
                 </tr>
                 <?php
