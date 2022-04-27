@@ -1229,7 +1229,7 @@ if (isset($_GET['upload']) && !FM_READONLY) {
     <script>
         Dropzone.options.fileUploader = {
             chunking: true,
-            chunkSize: 10000000,
+            chunkSize: 2000000,
             forceChunking: true,
             retryChunks: true,
             retryChunksLimit: 3,
