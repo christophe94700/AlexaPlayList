@@ -1,0 +1,29 @@
+.btn {
+	background-color: gray;
+	border: none;
+	color: white;
+	padding: 5px 60px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+	background-color: Blue;
+}
+.brd {
+	margin-left: auto;
+    margin-right: auto;
+	border: 10px solid gray;
+    max-width: 800px;
+	height: 600px;
+}
+
+.brdList {
+	margin-top: 20px;
+	margin-left: 20px;
+    margin-right: 20px;
+    max-width: 800px;
+	height: 420px;
+	overflow-y: auto;
+}
