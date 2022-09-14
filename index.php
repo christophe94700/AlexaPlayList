@@ -2501,9 +2501,10 @@ function fm_is_valid_ext($filename)
  */
 function fm_rename($old, $new)
 {
-    $isFileAllowed = fm_is_valid_ext($new);
+    // $isFileAllowed = fm_is_valid_ext($new); Bug to rename folder Christophe Caron
 
-    if(!$isFileAllowed) return false;
+    // if(!$isFileAllowed) return false;
+
 
     return (!file_exists($new) && file_exists($old)) ? rename($old, $new) : null;
 }
