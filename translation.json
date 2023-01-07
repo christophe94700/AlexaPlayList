@@ -390,7 +390,13 @@
         "Deleted":"Effacé",
         "Error while renaming from":"Erreur lors du changement de nom depuis",
         "Invalid characters in file name":"Caractères invalides dans le nom du fichier",
-        "Renamed from":"Renommé de"
+        "Renamed from":"Renommé de",
+		"Okay": "Valider",
+		"Search file in folder and subfolders...":"Rechercher un fichier dans un dossier et des sous-dossiers...",
+		"Are you sure want to rename?":"Voulez-vous vraiment renommer ?",
+		"Are you sure want to":"Voulez-vous vraiment ",
+		"Advanced Search":"Recherche Avancée",
+		"Filter":"Filtre"
 
       }
     },
