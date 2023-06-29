@@ -80,6 +80,12 @@ $iconv_input_encoding = 'UTF-8';
 // Doc - https://www.php.net/manual/en/datetime.format.php
 $datetime_format = 'd.m.y H:i:s';
 
+// Path display mode when viewing file information
+// 'full' => show full path
+// 'relative' => show path relative to root_path
+// 'host' => show path on the host
+$path_display_mode = 'full';
+
 // Allowed file extensions for create and rename files
 // e.g. 'txt,html,css,js'
 $allowed_file_extensions = 'mp3';
@@ -109,8 +115,15 @@ $online_viewer = 'google';
 // false => disable sticky header
 $sticky_navbar = true;
 
-// max upload file size
-$max_upload_size_bytes = 5000;
+// Maximum file upload size
+// Increase the following values in php.ini to work properly
+// memory_limit, upload_max_filesize, post_max_size
+$max_upload_size_bytes = 5000000000; // size 5,000,000,000 bytes (~5GB)
+
+// chunk size used for upload
+// eg. decrease to 1MB if nginx reports problem 413 entity too large
+$upload_chunk_size_bytes = 2000000; // chunk size 2,000,000 bytes (~2MB)
+
 
 // Possible rules are 'OFF', 'AND' or 'OR'
 // OFF => Don't check connection IP, defaults to OFF
@@ -124,7 +137,8 @@ $ip_silent = true;
 
 // IP-addresses, both ipv4 and ipv6
 $ip_whitelist = array(
-	'0.0.0.0'
+    '127.0.0.1',    // local ipv4
+    '::1'           // local ipv6
 );
 
 // IP-addresses, both ipv4 and ipv6
