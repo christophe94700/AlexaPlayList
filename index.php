@@ -6,14 +6,14 @@
  */
 
 /**
- *Alexa Générateur de liste MP3  Version 2.5.3
+ *Alexa Générateur de liste MP3  Version 2.5.4
  *https://github.com/christophe94700/AlexaPlayList
  *Christophe Caron
  *https://domotronic.fr
  *christophe@caron.tv
  */
 //TFM version
-define('VERSION', '2.5.3');
+define('VERSION', '2.5.4');
 
 //Application Title
 define('APP_TITLE', 'Alexa List MP3');
@@ -2237,13 +2237,13 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
         <table class="table table-bordered table-hover table-sm <?php echo $tableTheme; ?>" id="main-table">
             <thead class="thead-white">
             <tr>
-                <?php if (!FM_READONLY): ?>
+
                     <th style="width:3%" class="custom-checkbox-header">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="js-select-all-items" onclick="checkbox_toggle()">
                             <label class="custom-control-label" for="js-select-all-items"></label>
                         </div>
-                    </th><?php endif; ?>
+                    </th>
                 <th><?php echo lng('Name') ?></th>
                 <th><?php echo lng('Size') ?></th>
                 <th><?php echo lng('Modified') ?></th>
@@ -2257,8 +2257,8 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
             // link to parent folder
             if ($parent !== false) {
                 ?>
-                <tr><?php if (!FM_READONLY): ?>
-                    <td class="nosort"></td><?php endif; ?>
+                <tr>
+                    <td class="nosort"></td>
                     <td class="border-0" data-sort><a href="?p=<?php echo urlencode($parent) ?>"><i class="fa fa-chevron-circle-left go-back"></i> ..</a></td>
                     <td class="border-0" data-order></td>
                     <td class="border-0" data-order></td>
@@ -2295,9 +2295,11 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 }
                 ?>
                 <tr>
-                    <?php if (!FM_READONLY): ?>
+
                         <td class="custom-checkbox-td">
                         <div class="custom-control custom-checkbox">
+                        <!-- Read Only pour User -->
+                        <?php if (($img!="fa fa-folder-o")||(!FM_READONLY)): ?>
                             <input type="checkbox" class="custom-control-input" id="<?php echo $ii ?>" name="file[]" value="<?php echo fm_enc($f) ?>">
                             <label class="custom-control-label" for="<?php echo $ii ?>"></label>
                         </div>
@@ -2354,13 +2356,13 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 }
                 ?>
                 <tr>
-                    <?php if (!FM_READONLY): ?>
+                    
                         <td class="custom-checkbox-td">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="<?php echo $ik ?>" name="file[]" value="<?php echo fm_enc($f) ?>">
                             <label class="custom-control-label" for="<?php echo $ik ?>"></label>
                         </div>
-                        </td><?php endif; ?>
+                        </td>
                     <td data-sort=<?php echo fm_enc($f) ?>>
                         <div class="filename">
                         <?php
@@ -2423,12 +2425,14 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
     </div>
 
     <div class="row">
-        <?php if (!FM_READONLY): ?>
+
         <div class="col-xs-12 col-sm-9">
             <ul class="list-inline footer-action">
                 <li class="list-inline-item"> <a href="#/select-all" class="btn btn-small btn-outline-primary btn-2" onclick="select_all();return false;"><i class="fa fa-check-square"></i> <?php echo lng('SelectAll') ?> </a></li>
                 <li class="list-inline-item"><a href="#/unselect-all" class="btn btn-small btn-outline-primary btn-2" onclick="unselect_all();return false;"><i class="fa fa-window-close"></i> <?php echo lng('UnSelectAll') ?> </a></li>
                 <li class="list-inline-item"><a href="#/invert-all" class="btn btn-small btn-outline-primary btn-2" onclick="invert_all();return false;"><i class="fa fa-th-list"></i> <?php echo lng('InvertSelection') ?> </a></li>
+                <!-- Read Only pour User -->
+                <?php if (!FM_READONLY): ?>
                 <li class="list-inline-item"><input type="submit" class="hidden" name="delete" id="a-delete" value="Delete" onclick="return confirm('<?php echo lng('Delete selected files and folders?'); ?>')">
                     <a href="javascript:document.getElementById('a-delete').click();" class="btn btn-small btn-outline-primary btn-2"><i class="fa fa-trash"></i> <?php echo lng('Delete') ?> </a></li>
                 <!-- Suppression compression ZIP et TAR <li class="list-inline-item"><input type="submit" class="hidden" name="zip" id="a-zip" value="zip" onclick="return confirm('<?php echo lng('Create archive?'); ?>')">
@@ -2438,13 +2442,14 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 -->
                 <li class="list-inline-item"><input type="submit" class="hidden" name="copy" id="a-copy" value="Copy">
                     <a href="javascript:document.getElementById('a-copy').click();" class="btn btn-small btn-outline-primary btn-2"><i class="fa fa-files-o"></i> <?php echo lng('Copy') ?> </a></li>
-                <!-- liste MP3 -->	
+                <!-- liste MP3 -->
+                 <?php endif; ?>	
                 <li class="list-inline-item"><input type="submit" class="hidden" name="list" id="a-list" value="List">
 	            <a href="javascript:document.getElementById('a-list').click();" class="btn btn-small btn-outline-primary btn-2"><i class="fa fa-th-list"></i> Liste MP3 </a></li>
             </ul>
         </div>
         <div class="col-12"><a href="https://github.com/christophe94700/AlexaPlayList" target="_blank" class="float-right text-muted">Alexa List MP3 <?php echo VERSION; ?></a></div>
-        <?php endif; ?>
+
     </div>
 </form>
 
@@ -3790,13 +3795,17 @@ function fm_show_nav_path($path)
                         </div>
                     </li>
                     <?php if (!FM_READONLY): ?>
+                    <!-- Read only user -->
                     <li class="nav-item">
                         <a title="<?php echo lng('Upload') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;upload"><i class="fa fa-cloud-upload" aria-hidden="true"></i> <?php echo lng('Upload') ?></a>
                     </li>
+                    <?php endif; ?>
                     <!-- Lecteur MP3 -->
                     <li class="nav-item">
 	                    <a title="<?php echo lng('Player') ?>" class="nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;player"><i class="fa fa-play-circle" aria-hidden="true"></i> <?php echo lng('Player') ?></a>
 	                </li>
+	                <?php if (!FM_READONLY): ?>
+                    <!-- Read only user -->
                     <li class="nav-item">
                         <a title="<?php echo lng('NewItem') ?>" class="nav-link" href="#createNewItem" data-bs-toggle="modal" data-bs-target="#createNewItem"><i class="fa fa-plus-square"></i> <?php echo lng('NewItem') ?></a>
                     </li>
