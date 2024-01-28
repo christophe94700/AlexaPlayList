@@ -1,8 +1,10 @@
 <?php
 /**
  * H3K | Tiny File Manager V2.5.3
- * CCP Programmers | ccpprogrammers@gmail.com
- * https://tinyfilemanager.github.io
+ * @author CCP Programmers
+ * @email ccpprogrammers@gmail.com
+ * @github https://github.com/prasathmani/tinyfilemanager
+ * @link https://tinyfilemanager.github.io
  */
 
 /**
@@ -121,7 +123,11 @@ if (defined('FM_EMBED')) {
 
 //Generating CSRF Token
 if (empty($_SESSION['token'])) {
-    $_SESSION['token'] = bin2hex(random_bytes(32));
+    if (function_exists('random_bytes')) {
+        $_SESSION['token'] = bin2hex(random_bytes(32));
+    } else {
+    	$_SESSION['token'] = bin2hex(openssl_random_pseudo_bytes(32));
+    }
 }
 
 if (empty($auth_users)) {
@@ -250,7 +256,7 @@ if ($use_auth) {
                         <div class="card fat <?php echo fm_get_theme(); ?>">
                             <div class="card-body">
                                 <form class="form-signin" action="" method="post" autocomplete="off">
-                                    <div class="form-group">
+                                    <div class="mb-3">
                                        <div class="brand">
                                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 52" height="100%" width="200">
                                                 <g id="g72" transform="matrix(0.09375845,0,0,0.09241896,28.141679,5.4105941)">
@@ -2061,7 +2067,7 @@ if (isset($_GET['edit']) && !FM_READONLY) {
     header('X-XSS-Protection:0');
     fm_show_header(); // HEADER
     fm_show_nav_path(FM_PATH); // current path
-    // Ajout des répertoire php et media 
+    // Ajout des répertoires php et media 
     $file_url = FM_ROOT_URL. $dir_php . $dir_media . fm_convert_win((FM_PATH != '' ? '/' . FM_PATH : '') . '/' . $file);
     $file_path = $path . '/' . $file;
 
@@ -2463,7 +2469,6 @@ fm_show_footer();
 /**
  * It prints the css/js files into html
  * @param key The key of the external file to print.
- * @return The value of the key in the  array.
  */
 function print_external($key) {
     global $external;
@@ -3782,7 +3787,7 @@ function fm_show_nav_path($path)
                 <ul class="navbar-nav justify-content-end <?php echo fm_get_theme();  ?>">
                     <li class="nav-item mr-2">
                         <div class="input-group input-group-sm mr-1" style="margin-top:4px;">
-                            <input type="text" class="form-control" placeholder="<?php echo lng('Filter') ?>" aria-label="<?php echo lng('Search') ?>" aria-describedby="search-addon2" id="search-addon">
+                            <input type="text" class="form-control" placeholder="<?php echo lng('Search') ?>" aria-label="<?php echo lng('Search') ?>" aria-describedby="search-addon2" id="search-addon">
                             <div class="input-group-append">
                                 <span class="input-group-text brl-0 brr-0" id="search-addon2"><i class="fa fa-search"></i></span>
                             </div>
