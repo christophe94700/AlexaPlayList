@@ -1,21 +1,21 @@
 <?php
 /**
  * H3K | Tiny File Manager V2.5.3
- * @author CCP Programmers
+ * @author Prasath Mani | CCP Programmers
  * @email ccpprogrammers@gmail.com
  * @github https://github.com/prasathmani/tinyfilemanager
  * @link https://tinyfilemanager.github.io
  */
 
 /**
- *Alexa Générateur de liste MP3  Version 2.5.4
+ *Alexa Générateur de liste MP3  Version 2.5.3
  *https://github.com/christophe94700/AlexaPlayList
  *Christophe Caron
  *https://domotronic.fr
  *christophe@caron.tv
  */
 //TFM version
-define('VERSION', '2.5.4');
+define('VERSION', '2.5.3');
 
 //Application Title
 define('APP_TITLE', 'Alexa List MP3');
@@ -29,18 +29,16 @@ if (is_readable($config_file)) {
 
 // External CDN resources that can be used in the HTML (replace for GDPR compliance)
 $external = array(
-    'css-bootstrap' => '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">',
-    'css-dropzone' => '<link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet">',
-    'css-font-awesome' => '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">',
-    'css-highlightjs' => '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/' . $highlightjs_style . '.min.css">',
-    'js-ace' => '<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.13.1/ace.js"></script>',
-    'js-bootstrap' => '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>',
-    'js-dropzone' => '<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>',
-    'js-jquery' => '<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>',
-    'js-jquery-datatables' => '<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js" crossorigin="anonymous" defer></script>',
-    'js-highlightjs' => '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>',
-    'pre-jsdelivr' => '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin/><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"/>',
-    'pre-cloudflare' => '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin/><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com"/>'
+    'css-bootstrap' => '<link href="assets/css/bootstrap.min.css" rel="stylesheet">',
+    'css-dropzone' => '<link href="assets/css/dropzone.min.css" rel="stylesheet">',
+    'css-font-awesome' => '<link rel="stylesheet" href="assets/css/font-awesome.min.css" crossorigin="anonymous">',
+    'css-highlightjs' => '<link rel="stylesheet" href="assets/css/' . $highlightjs_style . '.min.css">',
+    'js-ace' => '<script src="assets/js/ace.js"></script>',
+    'js-bootstrap' => '<script src="assets/js/bootstrap.bundle.min.js"></script>',
+    'js-dropzone' => '<script src="assets/js/dropzone.min.js"></script>',
+    'js-jquery' => '<script src="assets/js/jquery-3.6.1.min.js"></script>',
+    'js-jquery-datatables' => '<script src="assets/js/dataTables.min.js"></script>',
+    'js-highlightjs' => '<script src="assets/js/highlight.min.js"></script>',
 );
 
 // --- EDIT BELOW CAREFULLY OR DO NOT EDIT AT ALL ---
@@ -106,7 +104,7 @@ if (defined('FM_EMBED')) {
         mb_regex_encoding('UTF-8');
     }
 
-    session_cache_limiter('nocache'); // Prevent logout issue after page was cached
+    session_cache_limiter('');
     session_name(FM_SESSION_ID );
     function session_error_handling_function($code, $msg, $file, $line) {
         // Permission denied for default session, try to create a new one
@@ -121,13 +119,9 @@ if (defined('FM_EMBED')) {
     restore_error_handler();
 }
 
-//Generating CSRF Token
+//Genrating CSRF Token
 if (empty($_SESSION['token'])) {
-    if (function_exists('random_bytes')) {
-        $_SESSION['token'] = bin2hex(random_bytes(32));
-    } else {
-    	$_SESSION['token'] = bin2hex(openssl_random_pseudo_bytes(32));
-    }
+    $_SESSION['token'] = bin2hex(random_bytes(32));
 }
 
 if (empty($auth_users)) {
@@ -239,7 +233,7 @@ if ($use_auth) {
                 unset($_SESSION[FM_SESSION_ID]['logged']);
                 fm_set_msg(lng('Login failed. Invalid username or password'), 'error');
                 sleep(1); // Pause pour ralentissement attack force brut
-                fm_redirect(FM_SELF_URL);
+                fm_redirect(FM_ROOT_URL);
             }
         } else {
             fm_set_msg(lng('password_hash not supported, Upgrade PHP version'), 'error');;
@@ -688,7 +682,7 @@ if (isset($_GET['copy'], $_GET['finish']) && !FM_READONLY) {
                $loop_count++;
             }
             if (fm_rcopy($from, $fn_duplicate, False)) {
-                fm_set_msg(sprintf('Copied from <b>%s</b> to <b>%s</b>', fm_enc($copy), fm_enc($fn_duplicate)));
+                fm_set_msg(sprintf('Copyied from <b>%s</b> to <b>%s</b>', fm_enc($copy), fm_enc($fn_duplicate)));
             } else {
                 fm_set_msg(sprintf('Error while copying from <b>%s</b> to <b>%s</b>', fm_enc($copy), fm_enc($fn_duplicate)), 'error');
             }
@@ -832,6 +826,7 @@ if (!empty($_FILES) && !FM_READONLY) {
         echo json_encode($response); exit();
     }
 
+    $override_file_name = false;
     $chunkIndex = $_POST['dzchunkindex'];
     $chunkTotal = $_POST['dztotalchunkcount'];
     $fullPathInput = fm_clean_path($_REQUEST['fullpath']);
@@ -866,8 +861,7 @@ if (!empty($_FILES) && !FM_READONLY) {
 
     $targetPath = $path . $ds;
     if ( is_writable($targetPath) ) {
-    	// Copie fichiers et répertoire
-        $fullPath = $path . '/' .($_REQUEST['fullpath']);
+        $fullPath = $path . '/' . basename($fullPathInput);
         $folder = substr($fullPath, 0, strrpos($fullPath, "/"));
 
         if(file_exists ($fullPath) && !$override_file_name && !$chunks) {
@@ -887,20 +881,7 @@ if (!empty($_FILES) && !FM_READONLY) {
                 if ($out) {
                     $in = @fopen($tmp_name, "rb");
                     if ($in) {
-                        if (PHP_VERSION_ID < 80009) {
-                            // workaround https://bugs.php.net/bug.php?id=81145
-                            do {
-                                for (;;) {
-                                    $buff = fread($in, 4096);
-                                    if ($buff === false || $buff === '') {
-                                        break;
-                                    }
-                                    fwrite($out, $buff);
-                                }
-                            } while (!feof($in));
-                        } else {
-                            stream_copy_to_stream($in, $out);
-                        }
+                        while ($buff = fread($in, 4096)) { fwrite($out, $buff); }
                         $response = array (
                             'status'    => 'success',
                             'info' => "file upload successful"
@@ -928,13 +909,7 @@ if (!empty($_FILES) && !FM_READONLY) {
                 }
 
                 if ($chunkIndex == $chunkTotal - 1) {
-                    if (file_exists ($fullPath)) {
-                        $ext_1 = $ext ? '.'.$ext : '';
-                        $fullPathTarget = $path . '/' . basename($fullPathInput, $ext_1) .'_'. date('ymdHis'). $ext_1;
-                    } else {
-                        $fullPathTarget = $fullPath;
-                    }
-                    rename("{$fullPath}.part", $fullPathTarget);
+                    rename("{$fullPath}.part", $fullPath);
                 }
 
             } else if (move_uploaded_file($tmp_name, $fullPath)) {
@@ -1257,6 +1232,9 @@ if (isset($_GET['upload']) && !FM_READONLY) {
                 <ul class="nav nav-tabs card-header-tabs">
                     <li class="nav-item">
                         <a class="nav-link active" href="#fileUploader" data-target="#fileUploader"><i class="fa fa-arrow-circle-o-up"></i> <?php echo lng('UploadingFiles') ?></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#urlUploader" class="js-url-upload" data-target="#urlUploader"><i class="fa fa-link"></i> <?php echo lng('Upload from URL') ?></a>
                     </li>
                 </ul>
             </div>
@@ -1915,8 +1893,7 @@ if (isset($_GET['view'])) {
         <div class="col-12">
             <p class="break-word"><b><?php echo lng($view_title) ?> "<?php echo fm_enc(fm_convert_win($file)) ?>"</b></p>
             <p class="break-word">
-                <?php $display_path = fm_get_display_path($file_path); ?>
-                <strong><?php echo $display_path['label']; ?>:</strong> <?php echo $display_path['path']; ?><br>
+                <strong>Full path:</strong> <?php echo fm_enc(fm_convert_win($file_path)) ?><br>
                 <strong>File size:</strong> <?php echo ($filesize_raw <= 1000) ? "$filesize_raw bytes" : $filesize; ?><br>
                 <strong>MIME-type:</strong> <?php echo $mime_type ?><br>
                 <?php
@@ -1942,7 +1919,7 @@ if (isset($_GET['view'])) {
                 // Image info
                 if ($is_image) {
                     $image_size = getimagesize($file_path);
-                    echo '<strong>'.lng('Image size').':</strong> ' . (isset($image_size[0]) ? $image_size[0] : '0') . ' x ' . (isset($image_size[1]) ? $image_size[1] : '0') . '<br>';
+                    echo lng('Image sizes').': ' . (isset($image_size[0]) ? $image_size[0] : '0') . ' x ' . (isset($image_size[1]) ? $image_size[1] : '0') . '<br>';
                 }
                 // Text info
                 if ($is_text) {
@@ -2015,7 +1992,7 @@ if (isset($_GET['view'])) {
             } elseif ($is_image) {
                 // Image content
                 if (in_array($ext, array('gif', 'jpg', 'jpeg', 'png', 'bmp', 'ico', 'svg', 'webp', 'avif'))) {
-                    echo '<p><input type="checkbox" id="preview-img-zoomCheck"><label for="preview-img-zoomCheck"><img src="' . fm_enc($file_url) . '" alt="image" class="preview-img"></label></p>';
+                    echo '<p><img src="' . fm_enc($file_url) . '" alt="image" class="preview-img-container" class="preview-img"></p>';
                 }
             } elseif ($is_audio) {
                 // Audio content
@@ -2175,8 +2152,7 @@ if (isset($_GET['chmod']) && !FM_READONLY && !FM_IS_WIN) {
             </h6>
             <div class="card-body">
                 <p class="card-text">
-                    <?php $display_path = fm_get_display_path($file_path); ?>
-                    <?php echo $display_path['label']; ?>: <?php echo $display_path['path']; ?><br>
+                    Full path: <?php echo $file_path ?><br>
                 </p>
                 <form action="" method="post">
                     <input type="hidden" name="p" value="<?php echo fm_enc(FM_PATH) ?>">
@@ -2289,12 +2265,6 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
                     $owner = posix_getpwuid(fileowner($path . '/' . $f));
                     $group = posix_getgrgid(filegroup($path . '/' . $f));
-                    if ($owner === false) {
-                        $owner = array('name' => '?');
-                    }
-                    if ($group === false) {
-                        $group = array('name' => '?');
-                    }
                 } else {
                     $owner = array('name' => '?');
                     $group = array('name' => '?');
@@ -2350,12 +2320,6 @@ $tableTheme = (FM_THEME == "dark") ? "text-white bg-dark table-dark" : "bg-white
                 if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
                     $owner = posix_getpwuid(fileowner($path . '/' . $f));
                     $group = posix_getgrgid(filegroup($path . '/' . $f));
-                    if ($owner === false) {
-                        $owner = array('name' => '?');
-                    }
-                    if ($group === false) {
-                        $group = array('name' => '?');
-                    }
                 } else {
                     $owner = array('name' => '?');
                     $group = array('name' => '?');
@@ -2751,30 +2715,6 @@ function fm_get_parent_path($path)
         return '';
     }
     return false;
-}
-
-function fm_get_display_path($file_path)
-{
-    global $path_display_mode, $root_path, $root_url;
-    switch ($path_display_mode) {
-        case 'relative':
-            return array(
-                'label' => 'Path',
-                'path' => fm_enc(fm_convert_win(str_replace($root_path, '', $file_path)))
-            );
-        case 'host':
-            $relative_path = str_replace($root_path, '', $file_path);
-            return array(
-                'label' => 'Host Path',
-                'path' => fm_enc(fm_convert_win('/' . $root_url . '/' . ltrim(str_replace('\\', '/', $relative_path), '/')))
-            );
-        case 'full':
-        default:
-            return array(
-                'label' => 'Full Path',
-                'path' => fm_enc(fm_convert_win($file_path))
-            );
-    }
 }
 
 /**
@@ -3787,7 +3727,7 @@ function fm_show_nav_path($path)
                 <ul class="navbar-nav justify-content-end <?php echo fm_get_theme();  ?>">
                     <li class="nav-item mr-2">
                         <div class="input-group input-group-sm mr-1" style="margin-top:4px;">
-                            <input type="text" class="form-control" placeholder="<?php echo lng('Search') ?>" aria-label="<?php echo lng('Search') ?>" aria-describedby="search-addon2" id="search-addon">
+                            <input type="text" class="form-control" placeholder="<?php echo lng('Filter') ?>" aria-label="<?php echo lng('Search') ?>" aria-describedby="search-addon2" id="search-addon">
                             <div class="input-group-append">
                                 <span class="input-group-text brl-0 brr-0" id="search-addon2"><i class="fa fa-search"></i></span>
                             </div>
@@ -4008,9 +3948,7 @@ $isStickyNavBar = $sticky_navbar ? 'navbar-fixed' : 'navbar-normal';
         .message.ok { border-color:green;color:green  }
         .message.error { border-color:red;color:red  }
         .message.alert { border-color:orange;color:orange  }
-        .preview-img { max-width:100%;max-height:80vh;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAKklEQVR42mL5//8/Azbw+PFjrOJMDCSCUQ3EABZc4S0rKzsaSvTTABBgAMyfCMsY4B9iAAAAAElFTkSuQmCC);cursor:zoom-in }
-        input#preview-img-zoomCheck[type=checkbox] { display:none }
-        input#preview-img-zoomCheck[type=checkbox]:checked ~ label > img { max-width:none;max-height:none;cursor:zoom-out }
+        .preview-img { max-width:100%;max-height:80vh;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAKklEQVR42mL5//8/Azbw+PFjrOJMDCSCUQ3EABZc4S0rKzsaSvTTABBgAMyfCMsY4B9iAAAAAElFTkSuQmCC) }
         .inline-actions > a > i { font-size:1em;margin-left:5px;background:#3785c1;color:#fff;padding:3px 4px;border-radius:3px; }
         .preview-video { position:relative;max-width:100%;height:0;padding-bottom:62.5%;margin-bottom:10px  }
         .preview-video video { position:absolute;width:100%;height:100%;left:0;top:0;background:#000  }
