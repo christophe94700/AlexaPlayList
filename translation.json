@@ -668,6 +668,9 @@
         "created": "créé",
         "dark": "sombre",
         "light": "clair",
+		"Total space": "Espace total",
+	    "Free space": "Espace libre",
+		"FullSize": "Taille totale",
         "to": "vers"
       }
     },
