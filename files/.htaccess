@@ -3,4 +3,3 @@ Deny from all
 <FilesMatch ".m3u">
     Allow from all
 </FilesMatch>
-Allow from 192.168.1.43

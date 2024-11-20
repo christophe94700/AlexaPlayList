@@ -129,8 +129,7 @@ $upload_chunk_size_bytes = 2000000; // chunk size 2,000,000 bytes (~2MB)
 // OFF => Don't check connection IP, defaults to OFF
 // AND => Connection must be on the whitelist, and not on the blacklist
 // OR => Connection must be on the whitelist, or not on the blacklist
-// AUTO => automatique login suivant profil user et adresse Ip 
-$ip_ruleset = 'AUTO';
+$ip_ruleset = 'OFF';
 
 // Should users be notified of their block?
 $ip_silent = true;
