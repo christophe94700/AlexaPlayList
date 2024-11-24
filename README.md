@@ -1,6 +1,6 @@
 # AlexaPlayList
 Alexa Générateur de liste MP3.
-Utlisitation avec blueprints.
+Utilisation avec blueprints.
 
 https://domotronic.fr/diy-cartes-microcontroleurs/alexa/ecouter-sa-playlist-avec-alexa/
 # WIKI
