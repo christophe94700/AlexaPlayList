@@ -51,7 +51,7 @@ $edit_files = true;
 
 // Default timezone for date() and time()
 // Doc - http://php.net/manual/en/timezones.php
-$default_timezone = 'Etc/UTC'; // UTC
+$default_timezone = 'Europe/Paris'; // UTC
 
 //Répertoire d'installation des fichiers php
 $dir_php='';//exemple '/mp3
